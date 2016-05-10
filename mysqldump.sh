@@ -1,16 +1,23 @@
 #! /bin/bash
+today=$(date +%A)
+if [ $today == 'Friday' ]
+    then
+        FOLDERNAME=$(date +%A)-$(date +%Y%m%d)
+    else
+        FOLDERNAME=$(date +%A)
+fi
  
-TIMESTAMP=$(date +"%F")
-BACKUP_DIR="backup/$TIMESTAMP"
-MYSQL_USER="root"
-MYSQL=/Applications/MAMP/Library/bin/mysql
-MYSQL_PASSWORD="root"
-MYSQLDUMP=/Applications/MAMP/Library/bin/mysqldump
+BACKUP_DIR="backup/$FOLDERNAME"
+HOST=""
+MYSQL_USER=""
+MYSQL=/usr/local/mysql/bin/mysql
+MYSQL_PASSWORD=""
+MYSQLDUMP=/usr/local/mysql/bin/mysqldump
  
-mkdir -p "$BACKUP_DIR/mysql"
+mkdir -p "$BACKUP_DIR"
  
-databases=`$MYSQL --user=$MYSQL_USER -p$MYSQL_PASSWORD -e "SHOW DATABASES;" | grep -Ev "(Database|information_schema|performance_schema)"`
+databases=`$MYSQL --host=$HOST --user=$MYSQL_USER -p$MYSQL_PASSWORD -e "SHOW DATABASES;" | grep -Ev "(Database|information_schema|performance_schema)"`
  
 for db in $databases; do
-  $MYSQLDUMP --force --opt --user=$MYSQL_USER -p$MYSQL_PASSWORD --databases $db | gzip > "$BACKUP_DIR/mysql/$db.gz"
+  $MYSQLDUMP --force --opt --host=$HOST --user=$MYSQL_USER -p$MYSQL_PASSWORD --databases $db | gzip > "$BACKUP_DIR/$db.gz"
 done
